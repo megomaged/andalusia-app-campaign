@@ -460,3 +460,10 @@ html.static .dd.on{animation:none}
 .close-row .icon{width:clamp(60px,9vh,84px);height:clamp(60px,9vh,84px);border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .close-row .stores{height:clamp(68px,10.5vh,96px);width:auto}
 .close-logo{width:min(320px,70vw);margin-top:6px;opacity:.95}
+/* 2026-11-20 finished copies: play on the main-copy card, watch button on each story */
+.mc-play{cursor:pointer}.mc-play .film-play{opacity:1;transform:none;width:84px;height:84px;margin:-42px 0 0 -42px}
+.mc-play:hover .film-play{transform:scale(1.08)}
+.story-watch{display:inline-flex;align-items:center;gap:10px;margin:0 0 14px;padding:10px 18px 10px 12px;border-radius:999px;font:600 13px/1 inherit;letter-spacing:.04em;color:var(--cream);background:rgba(244,232,210,.1);border:1px solid rgba(214,178,122,.5);cursor:pointer;transition:background .4s var(--ease),transform .4s var(--ease)}
+.story-watch:hover,.story-watch:focus-visible{background:rgba(214,178,122,.28);transform:translateY(-1px)}
+.story-watch i{width:26px;height:26px;border-radius:50%;background:var(--cream);display:grid;place-items:center}
+.story-watch i::before{content:"";border-left:9px solid #1E130B;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:3px}

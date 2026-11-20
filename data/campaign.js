@@ -19,7 +19,7 @@ window.CAMPAIGN = {
    "stories": 31,
    "hero_videos": 5,
    "main_copies": 2,
-   "tactical_videos": 4
+   "tactical_videos": 5
   }
  },
  "phases": [
@@ -788,7 +788,7 @@ window.CAMPAIGN = {
     "لو مشوار المستشفى في يومك"
    ],
    "kv": "employee",
-   "tier": null
+   "tier": "tactical"
   },
   {
    "n": 5,
@@ -904,7 +904,7 @@ window.CAMPAIGN = {
    "headline_img": "assets/el/headline_employee.webp",
    "post": "assets/social/posts_4x5/post_employee.webp",
    "story": "assets/social/stories_9x16/story_employee.webp",
-   "tier": null
+   "tier": "tactical"
   },
   {
    "id": "lawyer",
@@ -1145,6 +1145,59 @@ window.CAMPAIGN = {
    "src": "assets/video/ooh_lamp_posts.mp4",
    "poster": "assets/video/ooh_lamp_posts.jpg",
    "vertical": true
+  },
+  {
+   "id": "story_mom",
+   "group": "story",
+   "title": "Nourhan · Tactical film",
+   "src": "assets/video/story_mom.mp4",
+   "poster": "assets/video/story_mom.jpg",
+   "vertical": false,
+   "kv": "mom"
+  },
+  {
+   "id": "story_teacher",
+   "group": "story",
+   "title": "Mr. Sayed · Tactical film",
+   "src": "assets/video/story_teacher.mp4",
+   "poster": "assets/video/story_teacher.jpg",
+   "vertical": false,
+   "kv": "teacher"
+  },
+  {
+   "id": "story_businessman",
+   "group": "story",
+   "title": "George · Tactical film",
+   "src": "assets/video/story_businessman.mp4",
+   "poster": "assets/video/story_businessman.jpg",
+   "vertical": false,
+   "kv": "businessman"
+  },
+  {
+   "id": "story_employee",
+   "group": "story",
+   "title": "El-Hennawy · Tactical film",
+   "src": "assets/video/story_employee.mp4",
+   "poster": "assets/video/story_employee.jpg",
+   "vertical": false,
+   "kv": "employee"
+  },
+  {
+   "id": "story_lawyer",
+   "group": "story",
+   "title": "Wael · Tactical film",
+   "src": "assets/video/story_lawyer.mp4",
+   "poster": "assets/video/story_lawyer.jpg",
+   "vertical": false,
+   "kv": "lawyer"
+  },
+  {
+   "id": "waiting_seasons",
+   "group": "main",
+   "title": "Waiting Seasons · Main copy, option 2",
+   "src": "assets/video/waiting_seasons.mp4",
+   "poster": "assets/video/waiting_seasons.jpg",
+   "vertical": false
   }
  ],
  "video_structure": {
@@ -1156,6 +1209,7 @@ window.CAMPAIGN = {
    "mom",
    "teacher",
    "businessman",
+   "employee",
    "lawyer"
   ]
  },
@@ -1164,25 +1218,27 @@ window.CAMPAIGN = {
    "id": "goalkeeper",
    "kind": "kv",
    "title": "The Goalkeeper",
-   "status": "script to come"
+   "status": "in production"
   },
   {
    "id": "waiting_seasons",
    "kind": "film",
    "title": "Waiting Seasons",
    "title_ar": "الدور",
-   "length": "60s TVC",
+   "length": "65s film",
+   "option": "Option 2",
    "logline": "A man books at the hospital the old way and waits so long that every season of the year passes over him. All because he did not use the app.",
-   "endline": "من غير ضغط أعصاب… حمّل الـ App!",
-   "status": "storyboard keyframes",
+   "endline": "متحملش هم المستشفى.. وحمّل المستشفى",
+   "status": "final film",
+   "video": "waiting_seasons",
    "frames": [
-    "assets/waiting/s01_entrance.webp",
-    "assets/waiting/s03_nurse.webp",
-    "assets/waiting/s04_xray.webp",
-    "assets/waiting/s10_nurse_winter.webp",
-    "assets/waiting/s11_display.webp",
-    "assets/waiting/s15_phone.webp",
-    "assets/waiting/s18_packshot.webp"
+    "assets/waiting/film_1.webp",
+    "assets/waiting/film_2.webp",
+    "assets/waiting/film_3.webp",
+    "assets/waiting/film_4.webp",
+    "assets/waiting/film_5.webp",
+    "assets/waiting/film_6.webp",
+    "assets/waiting/film_7.webp"
    ]
   }
  ],

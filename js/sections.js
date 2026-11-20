@@ -13,8 +13,10 @@ var SECTIONS = (function () {
   var NUMW = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
   function tierOf(id) { var k = kvById(id); return k && k.tier ? k.tier : ''; }
   function hasScript(id) { return !!A.heroByKv[id]; }
-  function tierLabel(id, long) { var t = tierOf(id); return !t ? '' : (t === 'main' ? 'Main copy' : 'Tactical video') + (long && t === 'main' && !hasScript(id) ? ' · script to come' : ''); }
+  function tierLabel(id, long) { var t = tierOf(id); return !t ? '' : (t === 'main' ? 'Main copy' : 'Tactical video') + (long && t === 'main' && !hasScript(id) ? ' · in production' : ''); }
   function tierTag(id, long, cls) { var t = tierOf(id); return t ? h('span', { class: 'chip sm tier ' + t + (cls ? ' ' + cls : ''), 'data-tier': t, text: tierLabel(id, long) }) : null; }
+  function vidById(id) { return C.videos.filter(function (v) { return v.id === id; })[0]; }
+  function storyFilm(kv) { return C.videos.filter(function (v) { return v.group === 'story' && v.kv === kv; })[0]; }
   function lbBtn(el, items, i) { el.addEventListener('click', function () { A.lightbox(typeof items === 'function' ? items() : items, typeof i === 'function' ? i() : i); }); return el; }
 
   /* ---------- 1 hero ---------- */
@@ -112,7 +114,7 @@ var SECTIONS = (function () {
     var cards = list.map(function (m, ci) {
       var tag = h('span', { class: 'chip sm tier main', 'data-tier': 'main', text: mcStatus(m) }), pic, body = [], extra = null;
       if (m.kind === 'film' && m.frames && m.frames.length) {
-        var fitems = m.frames.map(function (src, i) { return { src: src, cap: m.title + ' · storyboard frame ' + (i + 1) }; });
+        var fitems = m.frames.map(function (src, i) { return { src: src, cap: m.title + ' · frame ' + (i + 1) }; });
         var cur = 0, imgs = m.frames.map(function (src, i) { var im = img(src, fitems[i].cap); if (i === 0) im.className = 'on'; return im; }), thumbs = [];
         var count = h('span', { class: 'mc-count', text: '01 / ' + pad2(m.frames.length) });
         var show = function (i) {
@@ -121,8 +123,9 @@ var SECTIONS = (function () {
           thumbs.forEach(function (t, j) { t.setAttribute('aria-pressed', j === cur ? 'true' : 'false'); });
           count.textContent = pad2(cur + 1) + ' / ' + pad2(imgs.length);
         };
-        pic = h('button', { class: 'mc-pic mc-frames', type: 'button', 'aria-label': 'Open storyboard frames of ' + m.title }, imgs.concat([count]));
-        lbBtn(pic, fitems, function () { return cur; });
+        var mv = m.video ? vidById(m.video) : null;
+        pic = h('button', { class: 'mc-pic mc-frames' + (mv ? ' mc-play' : ''), type: 'button', 'data-video': mv ? mv.id : null, 'aria-label': (mv ? 'Play ' : 'Open frames of ') + m.title }, imgs.concat([count, mv ? h('span', { class: 'film-play glass' }) : null]));
+        if (mv) pic.addEventListener('click', function () { A.player(mv); }); else lbBtn(pic, fitems, function () { return cur; });
         var hold = false;
         extra = h('div', { class: 'mc-strip' }, m.frames.map(function (src, i) {
           var t = h('button', { type: 'button', 'aria-pressed': i === 0 ? 'true' : 'false', 'aria-label': 'Frame ' + (i + 1), on: { click: function () { hold = true; show(i); } } }, img(src, ''));
@@ -134,7 +137,7 @@ var SECTIONS = (function () {
           show(cur + 1);
         }, 2600);
         body = [h('h3', null, [m.title, m.title_ar ? h('span', { ar: true, text: m.title_ar }) : null]),
-          h('div', { class: 'mc-meta' }, [tag, m.length ? h('span', { class: 'chip sm', text: m.length }) : null]),
+          h('div', { class: 'mc-meta' }, [tag, m.option ? h('span', { class: 'chip sm ember', text: m.option }) : null, m.length ? h('span', { class: 'chip sm', text: m.length }) : null]),
           h('p', { class: 'mc-log', text: m.logline }), m.endline ? h('p', { class: 'mc-end', ar: true, text: m.endline }) : null];
       } else {
         var k = kvById(m.id), one = [{ src: k.kv, cap: m.title + ' · ' + A.clean(k.headline) }];
@@ -166,12 +169,12 @@ var SECTIONS = (function () {
       ]);
     }
     var row = h('div', { class: 'cast-row' }, singles.map(function (id, i) { var x = A.heroByKv[id]; return card(id, i, '', x && x.title_ar); }));
-    row.appendChild(h('div', { class: 'cast-pair' }, [card('goalkeeper', 5, 'Script to come'), card('coach', 6, 'With the goalkeeper')]));
+    row.appendChild(h('div', { class: 'cast-pair' }, [card('goalkeeper', 5, 'In production'), card('coach', 6, 'With the goalkeeper')]));
     mainCopies(s);
     s.appendChild(h('div', { class: 'wrap cast', id: 'cast' }, [h('p', { class: 'eyebrow rv', text: 'The cast' }), row]));
 
     C.heroes.forEach(function (x, i) {
-      var post = postOfHero(x) || {}, kv = kvById(x.kv), n = x.script.length;
+      var post = postOfHero(x) || {}, kv = kvById(x.kv), n = x.script.length, sf = storyFilm(x.kv);
       var lines = x.script.map(function (t, j) {
         var c = j >= n - 3 ? 'sl' : (t.indexOf('وليه') === 0 ? 'qq' : '');
         return h('li', { class: c, text: t });
@@ -193,6 +196,7 @@ var SECTIONS = (function () {
             post.tiktok_time ? h('span', { class: 'chip sm' }, ['TikTok ', h('b', { text: post.tiktok_time })]) : null,
             post.campaign_type ? h('span', { class: 'chip sm', text: post.campaign_type }) : null
           ]),
+          sf ? h('button', { class: 'story-watch', type: 'button', 'data-video': sf.id, on: { click: function () { A.player(sf); } } }, [h('i'), 'Watch the film']) : null,
           h('ol', { class: 'script', ar: true }, lines)
         ]),
         h('div', { class: 'story-prog' }, prog)
@@ -569,7 +573,8 @@ var SECTIONS = (function () {
         img(v.poster, v.title), soon ? h('span', { class: 'chip sm ember soon-tag', text: 'Coming soon' }) : null,
         h('span', { class: 'film-play glass' }), h('span', { class: 'film-t' }, [h('small', { text: small }), parts[0]])]);
     }
-    var all = C.videos.filter(function (v) { return v.group !== 'outdoor'; });
+    /* the finished copies (story, main) play in the videos section, not on this wall */
+    var all = C.videos.filter(function (v) { return v.group !== 'outdoor' && v.group !== 'story' && v.group !== 'main'; });
     var master = all.filter(function (v) { return v.id === 'master_60s'; })[0] || all[0];
     var live = all.filter(function (v) { return v.group === 'feature' && v !== master; });
     var soon = all.filter(function (v) { return v.group === 'feature_soon'; });

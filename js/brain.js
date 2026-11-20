@@ -79,9 +79,10 @@ var BRAIN = (function () {
     [['posts', 'Social posts 4:5', 'social'], ['stories', 'Story designs 9:16', 'social'], ['carousel', 'Carousel', 'social'], ['outdoor', 'Outdoor mockups', 'outdoor'], ['films', 'Films', 'films']]
       .forEach(function (g) { add('grp:' + g[0], 'group', g[1], { to: g[2], data: { key: g[0] } }); link('grp:' + g[0], 'core'); });
     C.videos.forEach(function (v) {
+      if (v.group === 'main') return; /* shown by its main-copy node */
       var o = v.group === 'outdoor', rd = v.group === 'redesign', scr = rd && C.redesign && C.redesign.screens && C.redesign.screens[0];
       /* the new-design film: a headline node on the core; its thumbnail is the new home screen (the poster frame shows the old app) */
-      add('vid:' + v.id, o ? 'ooh' : 'film', v.title.split(' · ')[0], { data: v, img: scr ? scr.src : v.poster, to: o ? 'outdoor' : rd ? 'redesign' : 'films', r: v.id === 'master_60s' || rd ? 16 : 0 });
+      add('vid:' + v.id, o ? 'ooh' : 'film', v.title.split(' · ')[0], { data: v, img: scr ? scr.src : v.poster, to: o ? 'outdoor' : rd ? 'redesign' : v.group === 'story' ? 'story-' + v.kv : 'films', r: v.id === 'master_60s' || rd ? 16 : 0 });
       if (rd) link('vid:' + v.id, 'core');
       link('vid:' + v.id, o ? 'grp:outdoor' : 'grp:films');
     });
@@ -505,7 +506,8 @@ var BRAIN = (function () {
       }
     } else if (n.type === 'film' && d.frames) {
       body.push(h('p', { class: 'bp-tier' }, [h('span', { class: 'chip sm tier main', text: 'Main copy · ' + String(d.status || '').replace(' keyframes', '') }), d.length ? h('span', { class: 'chip sm', style: 'margin-left:6px', text: d.length }) : null]));
-      body.push(h('img', { src: d.frames[0], alt: d.title, class: 'bp-img' }));
+      var dv = d.video && C.videos.filter(function (x) { return x.id === d.video; })[0];
+      body.push(dv ? h('video', { controls: true, playsinline: true, preload: 'none', poster: dv.poster, src: dv.src, class: 'bp-video h' }) : h('img', { src: d.frames[0], alt: d.title, class: 'bp-img' }));
       body.push(h('div', { class: 'bp-strip' }, d.frames.slice(1).map(function (x) { return h('img', { src: x, alt: '', loading: 'lazy' }); })));
       if (d.title_ar) body.push(h('p', { class: 'bp-ar big', ar: true, text: d.title_ar }));
       body.push(h('p', { class: 'bp-note', text: d.logline }));
