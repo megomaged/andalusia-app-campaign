@@ -66,7 +66,7 @@ var BRAIN = (function () {
       if (m.kind !== 'film') return;
       add('main:' + m.id, 'film', m.title, { data: m, img: m.frames && m.frames[0], to: 'main-copies', r: 26, main: true }); link('main:' + m.id, 'core');
     });
-    (C.main_copies || []).forEach(function (m) { if (m.kind === 'kv') link('kv:' + m.id, 'core'); });
+    (C.main_copies || []).forEach(function (m) { if (m.kind === 'kv' || m.kv_link) link('kv:' + m.id, 'core'); });
     /* the coach: a supporting face in the goalkeeper key visual (no story, no entry in kvs) */
     add('cast:coach', 'kv', 'Coach', { data: { id: 'coach', coach: true }, img: S.castSrc('coach'), to: 'stories', r: 14 });
     link('cast:coach', 'kv:goalkeeper');

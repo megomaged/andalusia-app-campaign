@@ -1198,6 +1198,14 @@ window.CAMPAIGN = {
    "src": "assets/video/waiting_seasons.mp4",
    "poster": "assets/video/waiting_seasons.jpg",
    "vertical": false
+  },
+  {
+   "id": "goalkeeper_film",
+   "group": "main",
+   "title": "The Goalkeeper · Main copy, option 1",
+   "src": "assets/video/goalkeeper_film.mp4",
+   "poster": "assets/video/goalkeeper_film.jpg",
+   "vertical": false
   }
  ],
  "video_structure": {
@@ -1216,9 +1224,25 @@ window.CAMPAIGN = {
  "main_copies": [
   {
    "id": "goalkeeper",
-   "kind": "kv",
+   "kind": "film",
+   "kv_link": true,
    "title": "The Goalkeeper",
-   "status": "in production"
+   "title_ar": "حارس المرمى",
+   "length": "59s film",
+   "option": "Option 1",
+   "logline": "A five-a-side team is about to lose because its goalkeeper never showed up: he has been at the hospital since morning, waiting for his turn. All because he did not use the app.",
+   "endline": "متضيعش يومك.. لو مشوار المستشفى في يومك",
+   "status": "final film",
+   "video": "goalkeeper_film",
+   "frames": [
+    "assets/goalkeeper/film_1.webp",
+    "assets/goalkeeper/film_2.webp",
+    "assets/goalkeeper/film_3.webp",
+    "assets/goalkeeper/film_4.webp",
+    "assets/goalkeeper/film_5.webp",
+    "assets/goalkeeper/film_6.webp",
+    "assets/goalkeeper/film_7.webp"
+   ]
   },
   {
    "id": "waiting_seasons",
