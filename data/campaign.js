@@ -1228,7 +1228,7 @@ window.CAMPAIGN = {
    "kv_link": true,
    "title": "The Goalkeeper",
    "title_ar": "حارس المرمى",
-   "length": "59s film",
+   "length": "60s film",
    "option": "Option 1",
    "logline": "A five-a-side team is about to lose because its goalkeeper never showed up: he has been at the hospital since morning, waiting for his turn. All because he did not use the app.",
    "endline": "متضيعش يومك.. لو مشوار المستشفى في يومك",
