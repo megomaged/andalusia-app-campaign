@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12241A">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="data:,">
+<title>Andalusia Health — the redesigned app</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/stage.css">
+<link rel="stylesheet" href="css/sections.css">
+</head>
+<body data-tone="dark">
+<!--
+  Andalusia app presentation. Static, no libraries, no network; opens from file:// and from a sub-path.
+  Layers, back to front:  .atmo (fixed light)  ·  main (sections, text)  ·  .stage (fixed 3D phone, shared by the hero and the journey)  ·  .top / .dock (chrome)
+  URL switches:  ?static=1  intro finished, no smoothing (stills)   ·   ?capture=1  no clock of its own; driven by window.__site.frame(dtMs, scrollY)
+  Scripts are classic (file:// blocks modules). Order matters: data, engine, stage, try, main.
+-->
+
+<div class="atmo" aria-hidden="true">
+  <div class="atmo-dark"></div>
+  <div class="atmo-light"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="words" id="words"></div>
+</div>
+
+<header class="top">
+  <a class="brand" href="#hero" aria-label="Andalusia Health, back to the start"><img src="assets/brand/lockup.svg" alt="Andalusia Health" width="228" height="51"></a>
+  <nav class="dock" id="dock" aria-label="Sections"></nav>
+  <div class="count" aria-hidden="true"><b id="count-now">01</b><i></i><span id="count-all">03</span></div>
+</header>
+<div class="progress" aria-hidden="true"><i id="progress"></i></div>
+
+<!-- the phone: one actor for the hero and the journey -->
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="rig" id="rig">
+    <div class="halo"></div>
+    <div class="arch arch-dark"><i></i></div>
+    <div class="arch arch-light"><i></i></div>
+    <div class="ghosts" id="ghosts"></div>
+    <div class="ph-shadow"></div>
+    <div class="phone" id="phone">
+      <div class="ph-edges" id="ph-edges"></div>
+      <div class="ph-body"></div>
+      <div class="ph-screen" id="ph-screen"><div class="ph-veil" id="ph-veil"></div></div>
+      <div class="ph-island"></div>
+      <div class="ph-glare"><i id="ph-glare"></i></div>
+      <div class="lifts" id="lifts"></div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="sec hero" id="hero" data-nav="Intro">
+    <div class="hero-copy" id="hero-copy">
+      <p class="eyebrow rv" data-d="0.55"><span>Andalusia Health</span><i></i><span>the redesigned app</span></p>
+      <h1 class="display">
+        <span class="ln"><span class="rv" data-d="0.7">Respects</span></span>
+        <span class="ln"><span class="rv" data-d="0.8">your time.</span></span>
+        <span class="ln soft"><span class="rv" data-d="0.95">Reassures</span></span>
+        <span class="ln soft"><span class="rv" data-d="1.05">your family.</span></span>
+      </h1>
+      <p class="lede rv" data-d="1.3">One app for the whole visit, from finding a doctor to the pharmacy. It is built as a working prototype, in Arabic and English, and you can tap it further down this page.</p>
+      <ul class="facts rv" data-d="1.5">
+        <li><b>264</b><span>named screens and states</span></li>
+        <li><b>13</b><span>new features</span></li>
+        <li><b>6</b><span>layers over every screen</span></li>
+      </ul>
+    </div>
+    <a class="cue" href="#journey" id="cue"><span>Scroll</span><i></i></a>
+  </section>
+
+  <!-- ============ SECTION A — ONE VISIT, START TO FINISH (pinned) ============ -->
+  <section class="sec journey" id="journey" data-nav="The visit">
+    <div class="j-pin">
+      <div class="j-copy">
+        <header class="j-head">
+          <p class="eyebrow dark"><span>The main journey</span></p>
+          <h2 class="title">One visit, <br>start to finish.</h2>
+        </header>
+        <div class="j-steps" id="j-steps"></div>
+        <ol class="j-rail" id="j-rail"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION B — TRY IT (live prototype) ============ -->
+  <section class="sec try" id="try" data-nav="Try it">
+    <div class="try-grid">
+      <div class="try-copy">
+        <p class="eyebrow"><span>Try it</span></p>
+        <h2 class="title light">This is the app.<br><span class="soft">Tap it.</span></h2>
+        <p class="lede">The working prototype runs inside this phone. All the data is dummy and nothing calls a service.</p>
+        <ol class="hints">
+          <li><b>01</b><div><h3>Book a visit</h3><p>Tap <span class="ar" lang="ar" dir="rtl">حجز عيادة</span> on Home, then choose a doctor, a day and a time. The cost shows before you confirm.</p></div></li>
+          <li><b>02</b><div><h3>Change the look</h3><p>Tap the greeting on Home to open the profile: <span class="ar" lang="ar" dir="rtl">المظهر</span> for dark mode, <span class="ar" lang="ar" dir="rtl">الوضع المريح</span> for the comfort mode made for older patients.</p></div></li>
+          <li><b>03</b><div><h3>Switch to a family member</h3><p>Tap the round avatar at the top of Home and pick Mariam, Youssef or Hassan. The whole app follows.</p></div></li>
+        </ol>
+      </div>
+
+      <div class="try-phone" id="try-phone">
+        <div class="arch arch-try"><i></i></div>
+        <div class="live" id="live">
+          <div class="live-body"></div>
+          <div class="live-screen" id="live-screen">
+            <img class="live-poster" id="live-poster" src="assets/screens/home_ar.webp" alt="" loading="lazy" decoding="async">
+            <!-- the iframe is added by js/try.js while the page is at rest (the app is a 2 MB single file) -->
+            <button type="button" class="live-gate" id="live-gate" hidden><span>Tap to use the app</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-ctl" id="try-ctl">
+        <div class="ctl">
+          <span class="ctl-label">Language</span>
+          <div class="seg" role="group" aria-label="App language">
+            <button type="button" data-lang="ar" class="on" aria-pressed="true"><span class="ar" lang="ar">العربية</span></button>
+            <button type="button" data-lang="en" aria-pressed="false">English</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="ctl-label">Appearance</span>
+          <div class="seg" role="group" aria-label="App appearance">
+            <button type="button" data-theme="light" class="on" aria-pressed="true">Light</button>
+            <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+          </div>
+        </div>
+        <div class="ctl ctl-row">
+          <button type="button" class="ghost-btn" id="live-restart">Start again</button>
+          <a class="ghost-btn" id="live-open" href="assets/app/index.html?lang=ar" target="_blank" rel="noopener">Open full screen</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ later sections (ticket 002): empty anchors, in order. Remove `hidden`, add data-nav="Label", fill. ============ -->
+  <section class="sec slot" id="features" hidden data-slot="The 13 new features (FEATURES.md 1 to 13), one block each"></section>
+  <section class="sec slot" id="layers" hidden data-slot="The six layers: first run, family accounts, comfort mode, dark mode, Arabic right-to-left, presentation mode"></section>
+  <section class="sec slot" id="design-system" hidden data-slot="Design system: Andalusia Glass (tokens, type, glass recipe, components)"></section>
+  <section class="sec slot" id="before-after" hidden data-slot="Before and after: UX audit, 40 findings"></section>
+  <section class="sec slot" id="proposals" hidden data-slot="The two proposals (AI recommendation, needs an operations decision): compensation points at 15 minutes, two-minute call back"></section>
+  <section class="sec slot" id="close" hidden data-slot="Close"></section>
+
+</main>
+
+<footer class="foot">
+  <img src="assets/brand/lockup.svg" alt="Andalusia Health" width="228" height="51" loading="lazy">
+  <p>The redesigned Andalusia Health app. A prototype with dummy data.</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/stage.js"></script>
+<script src="js/try.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

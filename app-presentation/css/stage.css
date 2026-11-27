@@ -1,0 +1,53 @@
+/* Andalusia app presentation — the 3D phone stage (ticket 001).
+   One fixed phone, shared by the hero and the journey. Everything is in the app's 390 x 844 space (body 414 x 868) and scaled by js.
+   Only transform and opacity change per frame. No opacity on .rig or .phone: it would flatten the 3D. */
+
+.stage { position: fixed; inset: 0; z-index: 2; visibility: hidden; pointer-events: none; overflow: hidden; perspective: 1700px; contain: strict; }
+.rig { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+
+/* light behind the phone */
+.halo { position: absolute; left: -620px; top: -620px; width: 1240px; height: 1240px; border-radius: 50%; background: radial-gradient(closest-side, rgba(233, 211, 176, 0.3), rgba(201, 160, 99, 0.1) 46%, rgba(201, 160, 99, 0) 72%); will-change: transform, opacity; }
+
+/* the arch: the app's own signature (a luminous niche with a hairline bronze inner line) */
+.arch { position: absolute; left: -300px; top: -560px; width: 600px; height: 1180px; border-radius: 300px 300px 36px 36px; will-change: transform, opacity; }
+.arch i { position: absolute; inset: 16px; border-radius: 284px 284px 24px 24px; }
+.arch-dark { background: linear-gradient(180deg, rgba(233, 211, 176, 0.24) 0%, rgba(233, 211, 176, 0.07) 46%, rgba(233, 211, 176, 0) 82%); box-shadow: inset 0 0 0 1px rgba(201, 160, 99, 0.42); }
+.arch-dark i { box-shadow: inset 0 0 0 1px rgba(201, 160, 99, 0.2); }
+.arch-light { opacity: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.36) 50%, rgba(255, 255, 255, 0) 86%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 40px 90px -50px rgba(31, 56, 40, 0.3); }
+.arch-light i { box-shadow: inset 0 0 0 1px rgba(162, 123, 85, 0.34); }
+
+/* other screens of the app, fanned out behind the phone */
+.ghosts { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.ghost { position: absolute; left: -195px; top: -422px; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; background: #1a2a20; box-shadow: 0 0 0 6px #0c1711, 0 0 0 7px rgba(233, 211, 176, 0.26), 0 60px 90px -30px rgba(0, 0, 0, 0.55); will-change: transform, opacity; opacity: 0; backface-visibility: hidden; }
+.ghost img { width: 100%; height: 100%; }
+.ghost::after { content: ''; position: absolute; inset: 0; background: linear-gradient(200deg, rgba(10, 21, 14, 0) 30%, rgba(10, 21, 14, 0.5) 100%); }
+
+.ph-shadow { position: absolute; left: -330px; top: 270px; width: 660px; height: 300px; border-radius: 50%; background: radial-gradient(closest-side, rgba(4, 10, 6, 0.6), rgba(4, 10, 6, 0.26) 52%, rgba(4, 10, 6, 0) 76%); will-change: transform, opacity; }
+
+/* ---------------------------------------------------------------- the phone */
+.phone { position: absolute; left: -207px; top: -434px; width: 414px; height: 868px; transform-style: preserve-3d; will-change: transform; }
+.ph-edges { position: absolute; inset: 0; transform-style: preserve-3d; }
+.ph-edges i { position: absolute; inset: 0; border-radius: 59px; background: #121c16; }
+.ph-edges i:nth-child(odd) { background: #2b3a31; }
+.ph-edges i:last-child { background: #0b120e; box-shadow: 0 50px 80px -20px rgba(4, 10, 6, 0.5); }
+.ph-body { position: absolute; inset: 0; border-radius: 59px; background: linear-gradient(150deg, #56675b 0%, #1a261f 22%, #0b120e 52%, #22312a 82%, #6a7a6d 100%); box-shadow: inset 0 0 0 1.2px rgba(233, 211, 176, 0.5), inset 0 0 0 4px #0a100c, inset 0 0 0 5px rgba(255, 255, 255, 0.07); }
+.ph-screen { position: absolute; left: 12px; top: 12px; width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #f4eee1; transform: translateZ(0.5px); }
+.scr { position: absolute; inset: 0; will-change: transform, opacity; visibility: hidden; backface-visibility: hidden; }
+.scr img { width: 100%; height: 100%; }
+.scr i { position: absolute; inset: 0; background: #14241A; opacity: 0; will-change: opacity; }
+.plate { position: absolute; z-index: 10; overflow: hidden; opacity: 0; visibility: hidden; will-change: opacity; }
+.plate img { position: absolute; max-width: none; width: 390px; height: 844px; filter: blur(20px) saturate(0.75) brightness(0.92); }
+.plate::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 3px 14px rgba(20, 36, 26, 0.26), inset 0 0 0 1px rgba(20, 36, 26, 0.06); }
+.ph-veil { position: absolute; inset: 0; z-index: 20; background: #14241A; opacity: 0; will-change: opacity; pointer-events: none; }
+.ph-island { position: absolute; left: 50%; top: 23px; width: 98px; height: 29px; margin-left: -49px; border-radius: 16px; background: #06090a; transform: translateZ(0.8px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05); }
+.ph-island::after { content: ''; position: absolute; right: 11px; top: 10px; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #2b3f52, #0a0f14 62%); }
+.ph-glare { position: absolute; left: 12px; top: 12px; width: 390px; height: 844px; border-radius: 47px; overflow: hidden; transform: translateZ(1px); }
+.ph-glare i { position: absolute; left: -100%; top: 0; width: 300%; height: 100%; background: linear-gradient(105deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.2) 47%, rgba(255, 255, 255, 0.05) 52%, rgba(255, 255, 255, 0) 60%); will-change: transform, opacity; }
+
+/* cards of the screen lifted off the glass: the same pixels, cut out and brought forward */
+.lifts { position: absolute; left: 12px; top: 12px; width: 390px; height: 844px; transform-style: preserve-3d; }
+.lift { position: absolute; will-change: transform, opacity; opacity: 0; transform-style: preserve-3d; }
+.lift .cut { position: absolute; inset: 0; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
+.lift .cut img { position: absolute; max-width: none; width: 390px; height: 844px; }
+.lift .cut::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 1.5px 0 rgba(255, 255, 255, 0.95); }
+.lift .sh { position: absolute; left: 6%; right: 6%; top: 30%; bottom: -22%; border-radius: 40px; background: radial-gradient(closest-side, rgba(20, 36, 26, 0.5), rgba(20, 36, 26, 0)); transform: translateZ(-1px); will-change: opacity; }
