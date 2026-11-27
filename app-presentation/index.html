@@ -10,27 +10,30 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/stage.css">
 <link rel="stylesheet" href="css/sections.css">
+<link rel="stylesheet" href="css/more.css">
 </head>
-<body data-tone="dark">
+<body data-tone="dark" data-btone="dark">
 <!--
   Andalusia app presentation. Static, no libraries, no network; opens from file:// and from a sub-path.
-  Layers, back to front:  .atmo (fixed light)  ·  main (sections, text)  ·  .stage (fixed 3D phone, shared by the hero and the journey)  ·  .top / .dock (chrome)
+  Layers, back to front:  .atmo (fixed dark light)  ·  .sheets (the cream sheets of the light sections, scroll with the page; built by js/engine.js from data-tone="light")  ·  .words  ·  .stage (fixed 3D phone, shared by the hero and the journey)  ·  main (sections, text)  ·  .top / .dock (chrome)
   URL switches:  ?static=1  intro finished, no smoothing (stills)   ·   ?capture=1  no clock of its own; driven by window.__site.frame(dtMs, scrollY)
-  Scripts are classic (file:// blocks modules). Order matters: data, engine, stage, try, main.
+  Scripts are classic (file:// blocks modules). Order matters: data, engine, stage, try, features, layers, more, main.
 -->
+
+<div class="boot" id="boot" aria-hidden="true"><img src="assets/brand/lockup.svg" alt="" width="228" height="51"><i></i></div>
 
 <div class="atmo" aria-hidden="true">
   <div class="atmo-dark"></div>
-  <div class="atmo-light"></div>
   <div class="orb orb-a"></div>
   <div class="orb orb-b"></div>
-  <div class="words" id="words"></div>
 </div>
+<div class="sheets" id="sheets" aria-hidden="true"></div>
+<div class="words" id="words" aria-hidden="true"></div>
 
 <header class="top">
   <a class="brand" href="#hero" aria-label="Andalusia Health, back to the start"><img src="assets/brand/lockup.svg" alt="Andalusia Health" width="228" height="51"></a>
   <nav class="dock" id="dock" aria-label="Sections"></nav>
-  <div class="count" aria-hidden="true"><b id="count-now">01</b><i></i><span id="count-all">03</span></div>
+  <div class="count" aria-hidden="true"><b id="count-now">01</b><i></i><span id="count-all">09</span></div>
 </header>
 <div class="progress" aria-hidden="true"><i id="progress"></i></div>
 
@@ -56,7 +59,7 @@
 <main id="main">
 
   <!-- ============ HERO ============ -->
-  <section class="sec hero" id="hero" data-nav="Intro">
+  <section class="sec hero" id="hero" data-nav="Intro" data-tone="dark">
     <div class="hero-copy" id="hero-copy">
       <p class="eyebrow rv" data-d="0.55"><span>Andalusia Health</span><i></i><span>the redesigned app</span></p>
       <h1 class="display">
@@ -76,7 +79,7 @@
   </section>
 
   <!-- ============ SECTION A — ONE VISIT, START TO FINISH (pinned) ============ -->
-  <section class="sec journey" id="journey" data-nav="The visit">
+  <section class="sec journey" id="journey" data-nav="The visit" data-tone="light">
     <div class="j-pin">
       <div class="j-copy">
         <header class="j-head">
@@ -90,7 +93,7 @@
   </section>
 
   <!-- ============ SECTION B — TRY IT (live prototype) ============ -->
-  <section class="sec try" id="try" data-nav="Try it">
+  <section class="sec try" id="try" data-nav="Try it" data-tone="dark">
     <div class="try-grid">
       <div class="try-copy">
         <p class="eyebrow"><span>Try it</span></p>
@@ -108,7 +111,7 @@
         <div class="live" id="live">
           <div class="live-body"></div>
           <div class="live-screen" id="live-screen">
-            <img class="live-poster" id="live-poster" src="assets/screens/home_ar.webp" alt="" loading="lazy" decoding="async">
+            <img class="live-poster" id="live-poster" data-src="assets/screens/home_ar.webp" alt="">
             <!-- the iframe is added by js/try.js while the page is at rest (the app is a 2 MB single file) -->
             <button type="button" class="live-gate" id="live-gate" hidden><span>Tap to use the app</span></button>
           </div>
@@ -138,25 +141,247 @@
     </div>
   </section>
 
-  <!-- ============ later sections (ticket 002): empty anchors, in order. Remove `hidden`, add data-nav="Label", fill. ============ -->
-  <section class="sec slot" id="features" hidden data-slot="The 13 new features (FEATURES.md 1 to 13), one block each"></section>
-  <section class="sec slot" id="layers" hidden data-slot="The six layers: first run, family accounts, comfort mode, dark mode, Arabic right-to-left, presentation mode"></section>
-  <section class="sec slot" id="design-system" hidden data-slot="Design system: Andalusia Glass (tokens, type, glass recipe, components)"></section>
-  <section class="sec slot" id="before-after" hidden data-slot="Before and after: UX audit, 40 findings"></section>
-  <section class="sec slot" id="proposals" hidden data-slot="The two proposals (AI recommendation, needs an operations decision): compensation points at 15 minutes, two-minute call back"></section>
-  <section class="sec slot" id="close" hidden data-slot="Close"></section>
+  <!-- ============ FEATURES — 13 new features (pinned; a row of phones travels sideways) ============ -->
+  <section class="sec features" id="features" data-nav="Features" data-tone="light">
+    <div class="f-pin">
+      <div class="f-track" id="f-track" aria-hidden="true"></div>
+      <div class="f-col">
+        <header class="f-head">
+          <p class="eyebrow dark"><span>What is new</span></p>
+          <h2 class="title">Thirteen <br>new features.</h2>
+        </header>
+        <div class="f-items" id="f-items"></div>
+        <ol class="f-rail" id="f-rail"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LAYERS — one app, six ways (pinned; the same phone is wiped from one state to the next) ============ -->
+  <section class="sec layers" id="layers" data-nav="Layers" data-tone="dark">
+    <div class="l-pin">
+      <div class="l-stage" id="l-stage" aria-hidden="true">
+        <div class="arch arch-ly"><i></i></div>
+        <div class="l-phone" id="l-phone">
+          <div class="dev"><div class="dev-screen" id="l-screen"></div></div>
+          <div class="l-div" id="l-div"><i></i><b></b><span class="l-la" id="l-la"></span><span class="l-lb" id="l-lb"></span></div>
+        </div>
+        <div class="l-win" id="l-win"><img data-src="assets/screens/ly_present_ar.webp" alt="" width="1230" height="1200"></div>
+        <p class="l-cap" id="l-cap"></p>
+      </div>
+      <div class="l-col">
+        <header class="l-head">
+          <p class="eyebrow"><span>Over every screen</span></p>
+          <h2 class="title light">One app, <br><span class="soft">six ways.</span></h2>
+        </header>
+        <div class="l-items" id="l-items"></div>
+      </div>
+      <ol class="l-index" id="l-index"></ol>
+    </div>
+  </section>
+
+  <!-- ============ DESIGN SYSTEM — Andalusia Glass ============ -->
+  <section class="sec system" id="design-system" data-nav="Design" data-tone="light">
+    <header class="s-head">
+      <p class="eyebrow dark" data-rise><span>The design system</span></p>
+      <h2 class="title" data-rise>Andalusia Glass.</h2>
+      <p class="lede dark" data-rise>A frosted-glass language carried by Andalusia&rsquo;s own materials: cream paper, sage, deep green and bronze. Everything below is live; tap it.</p>
+    </header>
+
+    <!-- three rules -->
+    <div class="s-rules">
+      <article class="s-rule glass" data-rise>
+        <div class="s-demo s-demo-arch"><div class="niche"><i></i><b>DR</b></div></div>
+        <p class="s-k">Rule 01</p>
+        <h3>The arch.</h3>
+        <p>A doctor stands in a luminous niche with a hairline bronze inner line. Once per screen at most.</p>
+      </article>
+      <article class="s-rule glass" data-rise>
+        <div class="s-demo s-demo-pick">
+          <div class="days" id="s-days" role="group" aria-label="Pick a day">
+            <button type="button" class="day off" disabled><small>Sat</small>21</button>
+            <button type="button" class="day"><small>Sun</small>22</button>
+            <button type="button" class="day on" aria-pressed="true"><small>Mon</small>23</button>
+            <button type="button" class="day"><small>Tue</small>24</button>
+            <button type="button" class="day off" disabled><small>Wed</small>25</button>
+            <button type="button" class="day"><small>Thu</small>26</button>
+          </div>
+          <button type="button" class="btn-primary" id="s-book"><span>Book</span><i></i></button>
+        </div>
+        <p class="s-k">Rule 02</p>
+        <h3>Bronze is yours. <br>Green acts.</h3>
+        <p>The selected day, your time, your queue token and your points are bronze. The primary button, the active tab and send are deep green. They never swap.</p>
+      </article>
+      <article class="s-rule glass" data-rise>
+        <div class="s-demo s-demo-meter">
+          <div class="meter"><i style="--v: 0.72"></i></div>
+          <div class="meter dots"><i style="--v: 0.83"></i></div>
+          <div class="days small"><span class="day off">21</span><span class="day">22</span><span class="day off">25</span></div>
+        </div>
+        <p class="s-k">Rule 03</p>
+        <h3>Hatch and dots <br>are states.</h3>
+        <p>Diagonal hatch means unavailable or remaining. Bronze dots mean points and values that need care. No grey disabled fills.</p>
+      </article>
+    </div>
+
+    <!-- colour -->
+    <div class="s-row">
+      <div class="s-label" data-rise><p class="s-k">Colour</p><h3>Green-black ink, <br>never grey.</h3><p>No pink, lilac, blue or pure black. Shadows are tinted green.</p></div>
+      <ul class="s-colors" id="s-colors">
+        <li data-rise style="--c: #1F3828; --t: #FBF4E8"><b>Green 900</b><span>#1F3828</span><em>Primary fill</em></li>
+        <li data-rise style="--c: #3F5B46; --t: #FBF4E8"><b>Green 700</b><span>#3F5B46</span><em>Icons, numerals</em></li>
+        <li data-rise style="--c: #5E7F63; --t: #FBF4E8"><b>Green 500</b><span>#5E7F63</span><em>Meter fill</em></li>
+        <li data-rise style="--c: #DDEADF; --t: #14241A"><b>Sage 200</b><span>#DDEADF</span><em>Background</em></li>
+        <li data-rise style="--c: #FBF4E8; --t: #14241A"><b>Cream</b><span>#FBF4E8</span><em>Paper, text on dark</em></li>
+        <li data-rise style="--c: #E9D3B0; --t: #14241A"><b>Bronze 200</b><span>#E9D3B0</span><em>Glow</em></li>
+        <li data-rise style="--c: #C9A063; --t: #14241A"><b>Bronze 400</b><span>#C9A063</span><em>Accent, dots</em></li>
+        <li data-rise style="--c: linear-gradient(160deg, #8C653F, #805B39 52%, #6E4E2D); --t: #FFFFFF"><b>Selected</b><span>#8C653F &rarr; #6E4E2D</span><em>Every &ldquo;yours&rdquo; state</em></li>
+        <li data-rise style="--c: #14241A; --t: #FBF4E8"><b>Ink</b><span>#14241A</span><em>Text at 100 / 66 / 44 %</em></li>
+        <li data-rise style="--c: #C8513C; --t: #FFFFFF"><b>Alert</b><span>#C8513C</span><em>Emergency, end call only</em></li>
+      </ul>
+    </div>
+
+    <!-- type -->
+    <div class="s-row s-type">
+      <div class="s-label" data-rise><p class="s-k">Type</p><h3>Two faces, <br>one voice.</h3><p>Montserrat 500 and 600 for Latin, Graphik Arabic for Arabic. Tabular lining numerals everywhere.</p></div>
+      <div class="s-spec glass" data-rise>
+        <div class="spec-big"><span class="la">Aa</span><span class="ar" lang="ar">أب</span></div>
+        <div class="spec-names"><span>Montserrat</span><span class="ar" lang="ar" dir="rtl">Graphik Arabic · جرافيك</span></div>
+        <ul class="scale">
+          <li><em>Numeral XL · 108 / 0.9</em><b class="t-xl">A<i>·</i>12</b></li>
+          <li><em>Numeral L · 46</em><b class="t-l">1,240</b></li>
+          <li><em>Display · 33 / 1.04</em><b class="t-d">Find a doctor</b></li>
+          <li><em>Title · 19 / 1.2</em><b class="t-t">Your next visit</b></li>
+          <li><em>Body · 14 / 1.4</em><b class="t-b">Mon 23 Nov · 7:30 PM · In clinic</b></li>
+          <li><em>Arabic · Graphik</em><b class="t-a ar" lang="ar" dir="rtl">الاثنين 23 نوفمبر · 7:30 م</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- glass + shape -->
+    <div class="s-row s-glassrow">
+      <div class="s-label" data-rise><p class="s-k">Glass and shape</p><h3>Three layers <br>at most.</h3><p>Glass over the background, strong glass on glass, solid white on top. Radii nest: the outer radius is the inner one plus the padding.</p></div>
+      <div class="s-glass" id="s-glass" data-rise>
+        <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+        <div class="g-card glass">
+          <p class="g-tag">Glass · radius 32</p>
+          <div class="g-inner glass-strong">
+            <p class="g-tag">Strong glass · radius 24</p>
+            <div class="g-rowx"><span class="g-pill">Solid pill</span><button type="button" class="toggle on" id="s-toggle" role="switch" aria-checked="true" aria-label="Example switch"><i></i></button></div>
+          </div>
+          <code>blur(26px) saturate(145%)<br>lit top edge · green-tinted shadow</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- motion -->
+    <div class="s-row s-motion">
+      <div class="s-label" data-rise><p class="s-k">Motion</p><h3>No linear easing <br>anywhere.</h3><p>One curve carries navigation. A dissolve is kept for changes of context, a gentle spring for success.</p></div>
+      <div class="s-moves">
+        <div class="s-curve glass" data-rise>
+          <svg viewBox="-6 -6 112 112" aria-hidden="true"><path class="ax" d="M0 0V100H100"/><path class="cv" d="M0 100C20 20 20 0 100 0"/></svg>
+          <div class="dot"><i></i></div>
+          <p><b>cubic-bezier(0.2, 0.8, 0.2, 1)</b><span>Forward 320 ms · back 280 ms</span></p>
+        </div>
+        <div class="s-move glass" data-rise><div class="mv mv-push"><i></i><b></b></div><p><b>Forward</b><span>Slides in; the screen beneath moves 28 % and dims</span></p></div>
+        <div class="s-move glass" data-rise><div class="mv mv-sheet"><i></i><b></b></div><p><b>Bottom sheet</b><span>Backdrop to 44 %, the panel rises, 340 ms</span></p></div>
+        <div class="s-move glass" data-rise><div class="mv mv-ok"><b></b></div><p><b>Success</b><span>A gentle spring, 600 ms</span></p></div>
+        <div class="s-move glass" data-rise><button type="button" class="mv mv-press" aria-label="Press me"><b>Press</b></button><p><b>Press</b><span>Every tappable scales to 96 % in 160 ms</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BEFORE / AFTER ============ -->
+  <section class="sec ba" id="before-after" data-nav="Before / after" data-tone="dark">
+    <div class="ba-grid">
+      <div class="ba-copy">
+        <p class="eyebrow" data-rise><span>Before and after</span></p>
+        <h2 class="title light" data-rise>The same screens, <br><span class="soft">redrawn.</span></h2>
+        <p class="lede" data-rise>Drag the line across the phone. On one side is the app as it is today, on the other the redesign of the same screen.</p>
+        <div class="seg ba-tabs" id="ba-tabs" role="group" aria-label="Screen" data-rise></div>
+      </div>
+      <div class="ba-phone" id="ba-phone" data-rise>
+        <div class="arch arch-try"><i></i></div>
+        <div class="ba-dev" id="ba-dev">
+          <div class="dev"><div class="dev-screen" id="ba-screen">
+            <img class="ba-new" id="ba-new" alt="The redesigned screen">
+            <div class="ba-clip" id="ba-clip"><img class="ba-old" id="ba-old" alt="The same screen in the current app"></div>
+          </div></div>
+          <div class="ba-line" id="ba-line"><i></i><b></b></div>
+          <span class="ba-tag ba-tag-old">Today</span><span class="ba-tag ba-tag-new">Redesign</span>
+          <input type="range" id="ba-range" min="0" max="100" value="50" aria-label="How much of the current app is shown">
+        </div>
+      </div>
+      <div class="ba-notes" id="ba-notes" data-rise>
+        <div class="ba-note"><p class="s-k on-dark">Today</p><p id="ba-before"></p></div>
+        <div class="ba-note now"><p class="s-k on-dark">Redesign</p><p id="ba-after"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROPOSALS ============ -->
+  <section class="sec props" id="proposals" data-nav="Proposals" data-tone="light">
+    <header class="p-head">
+      <p class="p-flag" data-rise><i></i>AI recommendation &mdash; needs an operations decision</p>
+      <h2 class="title" data-rise>Two promises. <br>Operations decides.</h2>
+      <p class="lede dark" data-rise>The prototype shows both as working promises, with no disclaimer in the interface. They are proposals, not current policy.</p>
+    </header>
+    <div class="p-two">
+      <article class="p-card glass" data-rise>
+        <div class="p-shot" aria-hidden="true"><div class="dev"><div class="dev-screen"><img data-src="assets/screens/p_comp_ar.webp" alt=""></div></div></div>
+        <div class="p-body">
+          <p class="s-k">Proposal 01 · Compensation points</p>
+          <p class="p-num">15<small>min</small><span>or</span>50<small>points</small></p>
+          <h3>Seen within 15 minutes of your time, or 50 points land in your wallet by themselves.</h3>
+          <dl>
+            <dt>Where it shows</dt><dd>Your time is kept, the live visit, the wallet and its history, the points on Home.</dd>
+            <dt>Operations must decide</dt>
+            <dd><ul><li>Whether to promise a waiting time at all</li><li>The threshold: 15 minutes</li><li>The amount: 50 points</li><li>Which clinics</li><li>How the wait is measured</li></ul></dd>
+          </dl>
+        </div>
+      </article>
+      <article class="p-card glass" data-rise>
+        <div class="p-shot" aria-hidden="true"><div class="dev"><div class="dev-screen"><img data-src="assets/screens/f08_call_ar.webp" alt=""></div></div></div>
+        <div class="p-body">
+          <p class="s-k">Proposal 02 · Two-minute call back</p>
+          <p class="p-num">2:00</p>
+          <h3>One button, and a person calls within two minutes.</h3>
+          <dl>
+            <dt>Where it shows</dt><dd>Call me, with a countdown from 2:00, and Insurance and bills.</dd>
+            <dt>Operations must decide</dt>
+            <dd><ul><li>Staffing and hours for the promise</li><li>The time limit</li><li>What happens outside hours</li></ul></dd>
+          </dl>
+        </div>
+      </article>
+    </div>
+    <div class="p-small">
+      <p class="s-k" data-rise>Smaller promises in the copy that follow from the same two</p>
+      <ul>
+        <li data-rise><b>&ldquo;Notes are read by a person&rdquo;</b><span>You said it. We did it.</span><em>Decide: who reads the notes.</em></li>
+        <li data-rise><b>&ldquo;9 days on average&rdquo;</b><span>The wall of You said it. We did it.</span><em>Decide: whether a figure is published, and which.</em></li>
+        <li data-rise><b>&ldquo;Free parking for 2 hours&rdquo;</b><span>Getting there</span><em>Decide: whether parking is free, and for how long.</em></li>
+        <li data-rise><b>&ldquo;Free delivery today&rdquo;</b><span>A refill, in Medications</span><em>Decide: whether a refill is delivered free, the same day.</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="sec close" id="close" data-nav="Close" data-tone="dark">
+    <div class="c-in">
+      <img class="c-lock" data-rise src="assets/brand/lockup.svg" alt="Andalusia Health" width="228" height="51">
+      <p class="c-line" data-rise>Respects your time. <span>Reassures your family.</span></p>
+      <a class="c-btn" data-rise id="close-link" href="assets/app/index.html?lang=ar" target="_blank" rel="noopener"><span>Open the live prototype</span><i></i></a>
+    </div>
+  </section>
 
 </main>
-
-<footer class="foot">
-  <img src="assets/brand/lockup.svg" alt="Andalusia Health" width="228" height="51" loading="lazy">
-  <p>The redesigned Andalusia Health app. A prototype with dummy data.</p>
-</footer>
 
 <script src="js/data.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/stage.js"></script>
 <script src="js/try.js"></script>
+<script src="js/features.js"></script>
+<script src="js/layers.js"></script>
+<script src="js/more.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

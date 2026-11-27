@@ -1,9 +1,13 @@
-/* Andalusia app presentation — "Try it": the live prototype in a phone (ticket 001). Vanilla, classic script.
+/* Andalusia app presentation — "Try it": the live prototype in a phone (tickets 001, 002). Vanilla, classic script.
 
-   The app is the public single file (assets/app/index.html) in an iframe, opened in its own "frame" mode (390 x 844 device with a status bar);
-   the iframe window is 440 x 960 and only the device rectangle shows through .live-screen.
-   Language and appearance are switched from outside with window.postMessage (the bridge at the end of the app file, see
-   _ops/scripts/prep_assets.mjs). If the bridge does not answer, the switch reloads the app with ?lang= & ?theme= instead.
+   The app is the real single file, a byte copy of ../10_redesign_film/07_deliverables/andalusia_app_prototype.html (assets/app/index.html),
+   in an iframe, opened in its own "frame" mode (390 x 844 device with a status bar); the iframe window is 440 x 960 and only the device
+   rectangle shows through .live-screen.
+   Language and appearance are switched from outside:
+   - served over http(s) (GitHub Pages) the page and the app share an origin, so the switch calls the app's own `__proto.ly.set` and the app
+     keeps its place;
+   - opened from file:// the browser gives the page no access to the iframe, so the switch reloads the app with ?lang= & ?theme= instead.
+   (Ticket 001 appended a postMessage bridge to a modified copy of the app; ticket 002 carries the file unmodified, so the bridge is gone.)
 */
 (function () {
   'use strict';
@@ -23,8 +27,7 @@
     frame.setAttribute('allow', '');
     frame.src = url('frame=1&');
     screen.appendChild(frame);
-    // without the bridge (older copy of the app) the phone still shows once it has loaded
-    frame.addEventListener('load', function () { setTimeout(function () { screen.classList.add('ready'); }, 2600); });
+    frame.addEventListener('load', function () { watch(frame); });
   }
   function reload() { bridged = false; screen.classList.remove('ready'); if (frame) { frame.remove(); frame = null; } load(); }
 
@@ -33,21 +36,31 @@
     [].forEach.call(ctl.querySelectorAll('[data-theme]'), function (b) { var on = b.getAttribute('data-theme') === want.theme; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     openLink.href = url();
   }
+  // the app's own object, when the browser lets the page reach it (same origin); null from file://
+  function proto() { try { var w = frame && frame.contentWindow; return w && w.__proto && w.__proto.ly ? w.__proto : null; } catch (e) { return null; } }
+  function watch(f) {
+    var n = 0, t = setInterval(function () {
+      if (f !== frame) { clearInterval(t); return; }
+      var p = proto(); n++;
+      if (p) {
+        var tok = ''; try { tok = p.state().tok || ''; } catch (e) {}
+        if (tok && !/^(splash|home~skel)/.test(tok)) {
+          bridged = true; screen.classList.add('ready');
+          // the app can also be switched from inside (Profile): the controls outside follow
+          var l = p.ly.get('lang'), th = p.ly.get('theme'), ch = false;
+          if ((l === 'ar' || l === 'en') && l !== want.lang) { want.lang = l; ch = true; }
+          if ((th === 'light' || th === 'dark') && th !== want.theme) { want.theme = th; ch = true; }
+          if (ch) paint();
+        }
+      } else if (n > 6) screen.classList.add('ready');                 // no access (file://): show the app once it has had time to draw (the poster covers the splash)
+    }, 400);
+  }
   function send() {
     if (!frame) { load(); return; }
-    if (bridged && frame.contentWindow) frame.contentWindow.postMessage({ src: 'andalusia-site', lang: want.lang, theme: want.theme }, '*');
-    else reload();
+    var p = proto();
+    if (p) { try { p.ly.set('lang', want.lang); p.ly.set('theme', want.theme); return; } catch (e) {} }
+    reload();
   }
-
-  window.addEventListener('message', function (e) {
-    var d = e.data; if (!d || d.src !== 'andalusia-app' || !frame || e.source !== frame.contentWindow) return;
-    bridged = true;
-    if (d.ready) { screen.classList.add('ready'); if (d.lang !== want.lang || (d.theme !== want.theme && d.theme !== 'auto')) { send(); return; } }
-    // the app can also be switched from inside (Profile): the controls outside follow
-    if (d.lang === 'ar' || d.lang === 'en') want.lang = d.lang;
-    if (d.theme === 'light' || d.theme === 'dark') want.theme = d.theme;
-    paint();
-  });
 
   ctl.addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('button') : null; if (!b) return;

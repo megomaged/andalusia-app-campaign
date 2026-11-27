@@ -1,4 +1,4 @@
-/* Andalusia app presentation — the scroll engine (ticket 001). Vanilla, classic script.
+/* Andalusia app presentation — the scroll engine (tickets 001, 002). Vanilla, classic script.
 
    What it does
    - One requestAnimationFrame loop. Every frame it produces: E.y (eased scroll position), E.t (clock, ms), E.intro (seconds since the
@@ -7,6 +7,11 @@
      scrollbar and anchors stay native; E.y follows them with a short ease, so scrubbed animation never steps.
    - Sections: every visible .sec is measured (top, height). E.sec(id) -> { top, h, el }. E.progress(id) -> 0..1 through a pinned section.
    - E.scrollTo(y) eased jump; section dock, counter and progress line are built here from [data-nav].
+   - Tone: every section says data-tone="light|dark". A light section gets a cream "sheet" behind it (in .sheets, under the fixed phone), which
+     scrolls with the page, so the light changes with a moving edge and never through a mixed grey-green. The chrome reads the tone of the
+     section under it: body[data-tone] for the top bar, body[data-btone] for the dock at the bottom of a phone screen.
+   - [data-rise] elements rise into place as they enter the screen (scrubbed by scroll, so stills and the film are exact).
+   - img[data-src] inside a section is given its src when the section comes within two screens (E.lazy).
 
    Switches
    - prefers-reduced-motion (or ?reduced=1): no wheel easing, E.y = scrollY, intro finished, E.reduced = true (renderers drop ambient motion).
@@ -52,8 +57,44 @@
     for (var i = 0; i < E.measures.length; i++) E.measures[i](E);       // renderers may set heights first
     E.sections = [];
     var list = document.querySelectorAll('main > .sec:not([hidden])');
-    for (var j = 0; j < list.length; j++) { var el = list[j]; E.sections.push({ id: el.id, el: el, top: el.offsetTop, h: el.offsetHeight, nav: el.getAttribute('data-nav') }); }
+    for (var j = 0; j < list.length; j++) { var el = list[j]; E.sections.push({ id: el.id, el: el, top: el.offsetTop, h: el.offsetHeight, nav: el.getAttribute('data-nav'), tone: el.getAttribute('data-tone') || 'dark' }); }
     E.max = Math.max(0, document.documentElement.scrollHeight - E.vh);
+    sheets();
+    // where each rising element sits on the page (its own transform is taken out of the measure)
+    for (var r = 0; r < rises.length; r++) { var R = rises[r], b = R.el.getBoundingClientRect(); R.top = b.top + window.scrollY - (R.dy || 0); R.left = b.left; }
+  }
+  // the cream sheets of the light sections
+  var sheetBox = null, sheetEls = {};
+  function sheets() {
+    sheetBox = sheetBox || document.getElementById('sheets'); if (!sheetBox) return;
+    E.sections.forEach(function (s) {
+      if (s.tone !== 'light') return;
+      var d = sheetEls[s.id]; if (!d) { d = sheetEls[s.id] = document.createElement('div'); d.className = 'sheet'; d.innerHTML = '<i></i>'; sheetBox.appendChild(d); }
+      d.style.top = s.top + 'px'; d.style.height = s.h + 'px';
+    });
+  }
+  E.toneAt = function (py) { var t = 'dark'; for (var i = 0; i < E.sections.length; i++) { var s = E.sections[i]; if (s.top <= py) t = s.tone; } return t; };
+
+  // ---------------------------------------------------------------- rising elements and late images
+  var rises = [], lazies = [];
+  function collect() {
+    [].forEach.call(document.querySelectorAll('[data-rise]'), function (el, i) { rises.push({ el: el, top: 0, left: 0, v: -1, dy: 0 }); });
+    [].forEach.call(document.querySelectorAll('main > .sec'), function (sec) { var im = [].slice.call(sec.querySelectorAll('img[data-src]')); if (im.length) lazies.push({ id: sec.id, imgs: im }); });
+  }
+  E.lazy = function (id, imgs) { lazies.push({ id: id, imgs: imgs }); };
+  function late() {
+    for (var i = lazies.length - 1; i >= 0; i--) {
+      var s = E.sec(lazies[i].id);
+      if (E.y > s.top - E.vh * 2.2 && E.y < s.top + s.h + E.vh * 1.2) { lazies[i].imgs.forEach(function (im) { im.decoding = 'async'; im.src = im.getAttribute('data-src'); }); lazies.splice(i, 1); }
+    }
+    var vh = E.vh, y = E.y;
+    for (var r = 0; r < rises.length; r++) {
+      var R = rises[r], rel = R.top - y;
+      if (rel > vh * 1.3 || rel < -vh * 1.5) continue;
+      var v = E.still ? 1 : E.out(E.c01((vh * 0.97 - rel - (R.left / Math.max(1, E.vw)) * vh * 0.1) / (vh * 0.3)));
+      if (v === R.v) continue; R.v = v; R.dy = (1 - v) * 44;
+      R.el.style.opacity = v.toFixed(3); R.el.style.transform = v === 1 ? '' : 'translate3d(0,' + R.dy.toFixed(1) + 'px,0)';
+    }
   }
   E.measure = measure;
   E.sec = function (id) { for (var i = 0; i < E.sections.length; i++) if (E.sections[i].id === id) return E.sections[i]; return { top: 0, h: 0 }; };
@@ -102,13 +143,13 @@
   function onMove(e) { pmx = (e.clientX / E.vw) * 2 - 1; pmy = (e.clientY / E.vh) * 2 - 1; }
 
   // ---------------------------------------------------------------- chrome: dock, counter, progress
-  var dock, links = [], countNow, countAll, bar, activeIdx = -1;
+  var dock, links = [], countNow, countAll, bar, activeIdx = -1, toneT = '', toneB = '';
   function buildChrome() {
     dock = document.getElementById('dock'); countNow = document.getElementById('count-now'); countAll = document.getElementById('count-all'); bar = document.getElementById('progress');
     var navs = E.sections.filter(function (s) { return s.nav; });
     dock.innerHTML = ''; links = [];
     navs.forEach(function (s, i) {
-      var a = document.createElement('a'); a.href = '#' + s.id; a.innerHTML = '<b>' + ('0' + (i + 1)).slice(-2) + '</b><span>' + s.nav + '</span>';
+      var a = document.createElement('a'); a.href = '#' + s.id; a.title = s.nav; a.innerHTML = '<b>' + ('0' + (i + 1)).slice(-2) + '</b><span>' + s.nav + '</span>';
       dock.appendChild(a); links.push({ a: a, id: s.id });
     });
     if (countAll) countAll.textContent = ('0' + navs.length).slice(-2);
@@ -127,6 +168,9 @@
       links.forEach(function (l, i) { l.a.classList.toggle('on', i === idx); if (i === idx) l.a.setAttribute('aria-current', 'true'); else l.a.removeAttribute('aria-current'); });
       if (countNow) countNow.textContent = ('0' + (idx + 1)).slice(-2);
     }
+    var tt = E.toneAt(E.y + 40), bt = E.toneAt(E.y + E.vh - 44);
+    if (tt !== toneT) { toneT = tt; document.body.setAttribute('data-tone', tt); }
+    if (bt !== toneB) { toneB = bt; document.body.setAttribute('data-btone', bt); }
     if (bar) E.css(bar, 'transform', 'scaleX(' + (E.max ? E.c01(E.y / E.max) : 0).toFixed(4) + ')');
   }
 
@@ -137,7 +181,7 @@
     if (introAt >= 0) E.intro = E.still ? 99 : (E.t - introAt) / 1000;
     step(dt);
     E.mx = E.still ? 0 : E.damp(E.mx, pmx, 4.5, dt); E.my = E.still ? 0 : E.damp(E.my, pmy, 4.5, dt);
-    chrome();
+    chrome(); late();
     for (var i = 0; i < E.frames.length; i++) E.frames[i](E, dt);
   }
   function loop(now) {
@@ -149,7 +193,7 @@
 
   E.start = function () {
     if (E.started) return; E.started = true;
-    measure(); buildChrome();
+    collect(); measure(); buildChrome();
     // a #hash on load goes to its section at once
     var id = location.hash.slice(1);
     if (id && document.getElementById(id) && E.sec(id).h) { setScroll(E.sec(id).top); }

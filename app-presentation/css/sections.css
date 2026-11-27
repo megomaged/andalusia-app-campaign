@@ -2,16 +2,18 @@
 
 /* ================================================================ HERO */
 .hero { height: 165vh; height: 165svh; }
-.hero-copy { position: sticky; top: 0; height: 100vh; height: 100svh; width: min(56vw, 860px); padding: calc(var(--top-h) + 2vh) 0 6vh var(--pad); display: flex; flex-direction: column; justify-content: center; gap: clamp(18px, 2.6vh, 30px); will-change: transform, opacity; }
+/* ticket 002: laid out for heights 720 to 1000. The headline is sized by the height as well as the width, the block starts a clear step below
+   the lock-up, and the lowest 84 px are kept free for the scroll cue, so the cue can never sit on the three numbers. */
+.hero-copy { position: sticky; top: 0; height: 100vh; height: 100svh; width: min(56vw, 860px); padding: calc(var(--top-h) + clamp(18px, 4vh, 44px)) 0 84px var(--pad); display: flex; flex-direction: column; justify-content: center; gap: clamp(14px, 2.5vh, 30px); will-change: transform, opacity; }
+.hero .display { font-size: clamp(40px, min(6.1vw, 10.4vh), 104px); }
 .hero-copy .lede { max-width: 27em; }
 .facts { display: flex; gap: clamp(18px, 2.4vw, 40px); margin-top: clamp(4px, 1.4vh, 16px); }
 .facts li { display: flex; flex-direction: column; gap: 8px; padding-left: clamp(14px, 1.4vw, 22px); border-left: 1px solid rgba(233, 211, 176, 0.24); }
 .facts b { font: 600 clamp(26px, 2.5vw, 40px)/1 var(--font); letter-spacing: -0.04em; color: var(--cream); }
-.facts span { font: 500 12.5px/1.3 var(--font); color: var(--on-dark-3); max-width: 10em; }
-.cue { position: absolute; left: var(--pad); top: calc(100vh - 64px); top: calc(100svh - 64px); display: flex; align-items: center; gap: 14px; font: 600 11px/1 var(--font); letter-spacing: 0.22em; text-transform: uppercase; color: var(--on-dark-2); }
+.facts span { font: 500 12.5px/1.3 var(--font); color: var(--on-dark-2); max-width: 10em; }
+.cue { position: absolute; left: var(--pad); top: calc(100vh - 50px); top: calc(100svh - 50px); display: flex; align-items: center; gap: 14px; font: 600 11px/1 var(--font); letter-spacing: 0.22em; text-transform: uppercase; color: var(--on-dark-2); opacity: 0; }
 .cue i { position: relative; width: 64px; height: 1px; background: rgba(233, 211, 176, 0.25); overflow: hidden; }
 .cue i::after { content: ''; position: absolute; inset: 0; background: var(--bronze-400); transform: translateX(-100%); animation: cue 2.4s var(--ease) infinite; }
-@keyframes cue { 0% { transform: translateX(-100%); } 55%, 100% { transform: translateX(100%); } }
 
 /* ================================================================ SECTION A — THE JOURNEY */
 .journey { height: 640vh; }                                        /* js sets the real height from the number of steps */
@@ -85,8 +87,8 @@
 
 @media (max-width: 760px) {
   .hero { height: 150vh; height: 150svh; }
-  .hero-copy { width: 100%; padding: calc(var(--top-h) + 14px) var(--pad) 0; justify-content: flex-start; gap: 16px; }
-  .display { font-size: clamp(40px, 11.6vw, 56px); }
+  .hero-copy { width: 100%; padding: calc(var(--top-h) + 22px) var(--pad) 0; justify-content: flex-start; gap: 16px; }
+  .hero .display { font-size: clamp(40px, 11.6vw, 56px); }
   .hero-copy .lede { font-size: 14.5px; line-height: 1.5; max-width: 23.5em; }
   .facts { gap: 14px; margin-top: 2px; }
   .facts li { padding-left: 11px; gap: 5px; }

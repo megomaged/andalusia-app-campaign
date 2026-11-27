@@ -15,37 +15,50 @@
   var f1 = function (v) { return v.toFixed(1); }, f2 = function (v) { return v.toFixed(2); }, f3 = function (v) { return v.toFixed(3); };
 
   var jCopy, cue;
-  var stage, rig, phone, halo, archD, archL, shadow, glare, veil, atmoL, orbA, orbB, heroCopy, jHead, jRail;
+  var stage, rig, phone, halo, archD, archL, shadow, glare, veil, orbA, orbB, heroCopy, jHead, jRail;
   var scr = [], ghosts = [], heroLifts = [], stepLifts = [], steps = [], railItems = [], words = [];
   var N = S.journey.length;
   var STEP = 0.92;                 // viewport heights of scroll per journey step
   var P = {};                      // poses for this viewport
-  var ST = { mix: 0, step: 0 };    // what the rest of the page may read (tone, active step)
+  var ST = { mix: 0, step: 0 };    // what the rest of the page may read (active step)
   window.STAGE = ST;
 
-  function img(src, parent, eager) { var i = el('img', '', parent); i.alt = ''; i.decoding = 'async'; if (!eager) i.loading = 'eager'; i.src = S.screens + src + '.webp'; i.draggable = false; return i; }
-  function makeLift(parent, screen, rect) {
-    // the place the card leaves behind: the same pixels, frosted
+  // Images. The ones the first frame needs (Home, its lifted cards, the screens fanned out behind) are `first`: js/main.js waits until
+  // every one of them is loaded AND decoded before the page starts, so the first painted frame is complete (ticket 002, fix 1).
+  // The other journey screens are given their src after that, and each late arrival nudges its layer so it is rastered again.
+  var first = [], later = [];
+  function img(src, parent, now) {
+    var i = el('img', '', parent); i.alt = ''; i.draggable = false; i.loading = 'eager';
+    var url = S.screens + src + '.webp';
+    if (now) { i.decoding = 'sync'; i.src = url; first.push(i); } else later.push([i, url]);
+    i.addEventListener('load', nudge);
+    return i;
+  }
+  var nudged = 0;
+  function nudge() { nudged++; var ps = $('ph-screen'); if (ps) ps.style.transform = 'translateZ(' + (0.5 + (nudged % 2) * 0.01) + 'px)'; }
+  ST.first = first;
+  ST.loadRest = function () { later.forEach(function (p) { p[0].decoding = 'async'; p[0].src = p[1]; }); later.length = 0; };
+  function makeLift(parent, screen, rect, now) {
+    // the place the card leaves behind: a clean recess in the paper (ticket 002: it was the same pixels blurred, which left a blob where a portrait had been)
     var pl = el('div', 'plate'); $('ph-screen').insertBefore(pl, $('ph-veil')); pl.style.cssText = 'left:' + rect[0] + 'px;top:' + rect[1] + 'px;width:' + rect[2] + 'px;height:' + rect[3] + 'px;border-radius:' + rect[4] + 'px';
-    var pi = img(screen, pl); pi.style.left = -rect[0] + 'px'; pi.style.top = -rect[1] + 'px';
     var l = el('div', 'lift', parent); l.__plate = pl; l.style.cssText = 'left:' + rect[0] + 'px;top:' + rect[1] + 'px;width:' + rect[2] + 'px;height:' + rect[3] + 'px';
     el('div', 'sh', l);
     var cut = el('div', 'cut', l); cut.style.borderRadius = rect[4] + 'px';
-    var i = img(screen, cut); i.style.left = -rect[0] + 'px'; i.style.top = -rect[1] + 'px';
+    var i = img(screen, cut, now); i.style.left = -rect[0] + 'px'; i.style.top = -rect[1] + 'px';
     return l;
   }
 
   function build() {
     stage = $('stage'); rig = $('rig'); phone = $('phone'); glare = $('ph-glare'); veil = $('ph-veil');
     halo = rig.querySelector('.halo'); archD = rig.querySelector('.arch-dark'); archL = rig.querySelector('.arch-light'); shadow = rig.querySelector('.ph-shadow');
-    atmoL = document.querySelector('.atmo-light'); orbA = document.querySelector('.orb-a'); orbB = document.querySelector('.orb-b');
+    orbA = document.querySelector('.orb-a'); orbB = document.querySelector('.orb-b');
     heroCopy = $('hero-copy'); jHead = document.querySelector('.j-head'); jRail = $('j-rail'); jCopy = document.querySelector('.j-copy'); cue = $('cue');
 
     var edges = $('ph-edges'); for (var k = 0; k < 9; k++) { var e = el('i', '', edges); e.style.transform = 'translateZ(' + (-1.6 * (k + 1)) + 'px)'; }
 
     var screenBox = $('ph-screen');
     S.journey.forEach(function (st, i) {
-      var d = el('div', 'scr'); screenBox.insertBefore(d, veil); img(st.screen, d); el('i', '', d); scr.push(d);
+      var d = el('div', 'scr'); screenBox.insertBefore(d, veil); img(st.screen, d, i === 0); el('i', '', d); scr.push(d);
       stepLifts.push(makeLift($('lifts'), st.screen, st.lift));
 
       var s = el('div', 'j-step', $('j-steps'));
@@ -59,8 +72,8 @@
 
       var w = el('span', '', $('words')); w.lang = 'ar'; w.textContent = st.ar; words.push(w);
     });
-    S.hero.lifts.forEach(function (l) { var n = makeLift($('lifts'), S.hero.screen, l.rect); n.__z = l.z; heroLifts.push(n); });
-    S.hero.ghosts.forEach(function (g) { var d = el('div', 'ghost', $('ghosts')); img(g, d); ghosts.push(d); });
+    S.hero.lifts.forEach(function (l) { var n = makeLift($('lifts'), S.hero.screen, l.rect, true); n.__z = l.z; heroLifts.push(n); });
+    S.hero.ghosts.forEach(function (g) { var d = el('div', 'ghost', $('ghosts')); img(g, d, true); ghosts.push(d); });
   }
 
   // ---------------------------------------------------------------- poses for this viewport
@@ -107,8 +120,9 @@
     var exit = c01(out / vh);
     var amb = still ? 0 : 1 - exit;
 
-    if (out > vh * 1.08) { css(stage, 'visibility', 'hidden'); lightOnly(hp, out, vh); return; }
-    css(stage, 'visibility', 'visible');
+    // past the journey the stage is parked off the screen as well as hidden (its screens and cards set their own visibility, which a hidden parent does not override)
+    if (out > vh * 1.08) { css(stage, 'visibility', 'hidden'); css(stage, 'transform', 'translate3d(0,-300vh,0)'); lightOnly(jTop, y, vh); return; }
+    css(stage, 'visibility', 'visible'); css(stage, 'transform', 'none');
 
     // ---- journey: which step, where in it
     var f = c01((y - jTop) / L) * N; if (f >= N) f = N - 0.0001;
@@ -144,12 +158,12 @@
     css(phone, 'transform', 'rotateX(' + f2(rx) + 'deg) rotateY(' + f2(ry) + 'deg) rotateZ(' + f2(rz) + 'deg) scale3d(' + f3(s) + ',' + f3(s) + ',' + f3(s) + ')');
 
     // ---- light
-    var mix = lightOnly(hp, out, vh);
+    var mix = lightOnly(jTop, y, vh);
     css(halo, 'opacity', f3((1 - mix * 0.75) * I * (1 - exit)));
     css(halo, 'transform', 'translate3d(' + f1(-60 * s) + 'px,' + f1(-40 * s) + 'px,' + f1(-520 * s) + 'px) scale(' + f3(s * 1.5) + ')');
     var archT = 'translate3d(' + f1(lerp(26, 0, e) * s) + 'px,' + f1(lerp(30, 10, e) * s) + 'px,' + f1(lerp(-420, -300, e) * s) + 'px) rotateY(' + f2(ry * 0.25) + 'deg) scale(' + f3(s * lerp(1.16, 1.08, e) * (0.9 + 0.1 * Ig)) + ')';
     css(archD, 'transform', archT); css(archL, 'transform', archT);
-    css(archD, 'opacity', f3((1 - mix) * Ig * (1 - smooth((e - 0.5) / 0.5)))); css(archL, 'opacity', f3(mix * (1 - smooth(out / (vh * 0.4)))));
+    css(archD, 'opacity', f3((1 - mix) * Ig * (1 - smooth((e - 0.5) / 0.5)))); css(archL, 'opacity', f3(mix * (1 - smooth(out / (vh * 0.3)))));
     css(shadow, 'transform', 'translate3d(' + f1(30 * s) + 'px,' + f1(60 * s) + 'px,' + f1(-160 * s) + 'px) scale(' + f3(s) + ')');
     css(shadow, 'opacity', f3(lerp(0.95, 0.42, mix) * I));
     css(glare.parentNode, 'opacity', f3(0.55 + 0.45 * (1 - mix)));
@@ -199,8 +213,8 @@
     css(heroCopy, 'transform', 'translate3d(0,' + f1(-hp * vh * 0.2) + 'px,0)');
     css(heroCopy, 'visibility', hp > 0.45 ? 'hidden' : 'visible');
     css(cue, 'opacity', f3((1 - smooth(hp / 0.12)) * (still ? 1 : E.out((E.intro - 2) / 1))));
-    var leave = 1 - smooth(out / (vh * 0.3));                                    // the journey's text goes before the light changes
-    css(jCopy, 'opacity', f3(leave * (E.mobile ? smooth((hp - 0.74) / 0.24) : 1)));       // on a phone the text waits until the phone has moved out of its way
+    var leave = 1 - smooth((out - vh * 0.12) / (vh * 0.3));                      // the big word behind the phone goes as the sheet's lower edge comes up
+    css(jCopy, 'opacity', f3(E.mobile ? smooth((hp - 0.74) / 0.24) : 1));       // on a phone the text waits until the phone has moved out of its way
     for (var j = 0; j < N; j++) {
       var loc = f - j, inn = j === 0 ? 1 : smooth((loc + 0.14) / 0.14), ou = j === N - 1 ? 1 : 1 - smooth((loc - 0.66) / 0.13), o = inn * ou;
       if (y < jTop) o = j === 0 ? 1 : 0;
@@ -227,15 +241,16 @@
     return k;
   }
 
-  // the light of the page: dark stage -> the app's cream and sage -> dark again for "Try it"
-  function lightOnly(hp, out, vh) {
-    var mix = smooth((hp - 0.3) / 0.5) * (1 - smooth((out - vh * 0.2) / (vh * 0.5)));
-    css(atmoL, 'opacity', f3(mix));
+  // the light around the phone: the journey's cream sheet rises behind it (the sheet itself scrolls with the page, see js/engine.js);
+  // `mix` is how far the phone is inside that light, and only changes the phone's own arch and shadow
+  function lightOnly(jTop, y, vh) {
+    var edge = jTop - y;                                                          // where the top edge of the sheet is on the screen
+    var mix = smooth((vh * 0.8 - edge) / (vh * 0.55));
     if (!E.still) {
-      css(orbA, 'transform', 'translate3d(' + f1(E.mx * -18) + 'px,' + f1(-E.y * 0.06 + E.my * -12) + 'px,0)');
-      css(orbB, 'transform', 'translate3d(' + f1(E.mx * 24) + 'px,' + f1(E.y * 0.04 + E.my * 16) + 'px,0)');
+      css(orbA, 'transform', 'translate3d(' + f1(E.mx * -18) + 'px,' + f1(-Math.min(E.y, vh * 12) * 0.06 + E.my * -12) + 'px,0)');
+      css(orbB, 'transform', 'translate3d(' + f1(E.mx * 24) + 'px,' + f1(Math.min(E.y, vh * 12) * 0.04 + E.my * 16) + 'px,0)');
     }
-    if (ST.mix !== mix) { ST.mix = mix; var tone = mix > 0.5 ? 'light' : 'dark'; if (document.body.getAttribute('data-tone') !== tone) document.body.setAttribute('data-tone', tone); }
+    ST.mix = mix;
     return mix;
   }
 

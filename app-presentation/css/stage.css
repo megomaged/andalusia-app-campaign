@@ -2,7 +2,7 @@
    One fixed phone, shared by the hero and the journey. Everything is in the app's 390 x 844 space (body 414 x 868) and scaled by js.
    Only transform and opacity change per frame. No opacity on .rig or .phone: it would flatten the 3D. */
 
-.stage { position: fixed; inset: 0; z-index: 2; visibility: hidden; pointer-events: none; overflow: hidden; perspective: 1700px; contain: strict; }
+.stage { position: fixed; inset: 0; z-index: 2; visibility: hidden; pointer-events: none; overflow: hidden; perspective: 1700px; }
 .rig { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
 
 /* light behind the phone */
@@ -18,7 +18,7 @@
 
 /* other screens of the app, fanned out behind the phone */
 .ghosts { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
-.ghost { position: absolute; left: -195px; top: -422px; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; background: #1a2a20; box-shadow: 0 0 0 6px #0c1711, 0 0 0 7px rgba(233, 211, 176, 0.26), 0 60px 90px -30px rgba(0, 0, 0, 0.55); will-change: transform, opacity; opacity: 0; backface-visibility: hidden; }
+.ghost { position: absolute; left: -195px; top: -422px; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; background: #1a2a20; box-shadow: 0 0 0 6px #0c1711, 0 0 0 7px rgba(233, 211, 176, 0.26), 0 60px 90px -30px rgba(0, 0, 0, 0.55); will-change: transform, opacity; opacity: 0; }
 .ghost img { width: 100%; height: 100%; }
 .ghost::after { content: ''; position: absolute; inset: 0; background: linear-gradient(200deg, rgba(10, 21, 14, 0) 30%, rgba(10, 21, 14, 0.5) 100%); }
 
@@ -32,12 +32,11 @@
 .ph-edges i:last-child { background: #0b120e; box-shadow: 0 50px 80px -20px rgba(4, 10, 6, 0.5); }
 .ph-body { position: absolute; inset: 0; border-radius: 59px; background: linear-gradient(150deg, #56675b 0%, #1a261f 22%, #0b120e 52%, #22312a 82%, #6a7a6d 100%); box-shadow: inset 0 0 0 1.2px rgba(233, 211, 176, 0.5), inset 0 0 0 4px #0a100c, inset 0 0 0 5px rgba(255, 255, 255, 0.07); }
 .ph-screen { position: absolute; left: 12px; top: 12px; width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #f4eee1; transform: translateZ(0.5px); }
-.scr { position: absolute; inset: 0; will-change: transform, opacity; visibility: hidden; backface-visibility: hidden; }
+.scr { position: absolute; inset: 0; will-change: transform, opacity; visibility: hidden; }
 .scr img { width: 100%; height: 100%; }
 .scr i { position: absolute; inset: 0; background: #14241A; opacity: 0; will-change: opacity; }
-.plate { position: absolute; z-index: 10; overflow: hidden; opacity: 0; visibility: hidden; will-change: opacity; }
-.plate img { position: absolute; max-width: none; width: 390px; height: 844px; filter: blur(20px) saturate(0.75) brightness(0.92); }
-.plate::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 3px 14px rgba(20, 36, 26, 0.26), inset 0 0 0 1px rgba(20, 36, 26, 0.06); }
+.plate { position: absolute; z-index: 10; overflow: hidden; opacity: 0; visibility: hidden; will-change: opacity; background: linear-gradient(165deg, #E7E3D3 0%, #DDE3D4 58%, #D3DDCF 100%); }
+.plate::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 4px 16px rgba(20, 36, 26, 0.22), inset 0 0 0 1px rgba(20, 36, 26, 0.07), inset 0 -1px 0 rgba(255, 255, 255, 0.6); }
 .ph-veil { position: absolute; inset: 0; z-index: 20; background: #14241A; opacity: 0; will-change: opacity; pointer-events: none; }
 .ph-island { position: absolute; left: 50%; top: 23px; width: 98px; height: 29px; margin-left: -49px; border-radius: 16px; background: #06090a; transform: translateZ(0.8px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05); }
 .ph-island::after { content: ''; position: absolute; right: 11px; top: 10px; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #2b3f52, #0a0f14 62%); }
